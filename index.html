@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Джиган Евгений</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+  /* --- БАЗА --- */
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family:"Segoe UI", Roboto, Arial, sans-serif;
+    background:#101010;
+    color:#e6e6e6;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    overflow-y:auto;
+    scroll-behavior:smooth;
+    /* scroll snapping for sections */
+    scroll-snap-type: y mandatory;
+  }
+  a{color:inherit}
+  .container{max-width:1200px;margin:0 auto;padding:0 20px}
+
+  /* --- СЛАЙДЕР --- */
+  body.slider-active{overflow:hidden} /* пока слайдер активен — отключаем основной скролл */
+  .slider-wrapper{
+    position:relative;
+    height:100vh;
+    overflow:hidden;
+    will-change:transform,opacity;
+    transition:transform 1s ease,opacity 1s ease;
+    z-index:15;
+    scroll-snap-align:start;
+  }
+  .page{
+    position:absolute;top:0;left:0;width:100%;height:100vh;
+    display:flex;align-items:center;justify-content:center;padding:20px;
+    background-size:cover;background-position:center center;
+    transform:translateY(100%);opacity:0;
+    transition:transform 1s cubic-bezier(.22,1,.36,1),opacity .8s ease,background-position .2s ease;
+  }
+  .page.active{transform:translateY(0);opacity:1;z-index:2}
+  .page.prev{transform:translateY(-100%);opacity:.3;z-index:1}
+  .page-content{max-width:880px;background:rgba(0,0,0,.55);padding:40px;border-radius:18px;color:#fff;text-align:center;backdrop-filter:blur(4px)}
+  .page h1{font-size:3.2rem;margin:0 0 12px}
+  .page p{font-size:1.15rem;margin:0}
+
+  .nav-dots{position:fixed;right:28px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:12px;z-index:130}
+  .dot{width:14px;height:14px;border-radius:50%;background:rgba(255,255,255,.24);cursor:pointer;transition:all .22s}
+  .dot.active{background:#fff;transform:scale(1.28)}
+
+  .slider-wrapper.to-content{transform:translateY(-100%);opacity:0}
+  .slider-wrapper.hidden{display:none!important;z-index:0!important}
+
+  /* --- СЕКЦИИ (FULLSCREEN) --- */
+  section.content-section{
+    min-height:100vh; /* fill viewport */
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:40px 20px;
+    scroll-snap-align:start;
+    box-sizing:border-box;
+  }
+  /* inner container centers content vertically with safe spacing */
+  .section-inner{
+    width:100%;
+    max-width:1200px;
+    margin:0 auto;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .section-title{text-align:center;margin-bottom:24px;width:100%}
+  .section-title h2{font-size:2.6rem;margin:0;color:#fff}
+
+  /* --- About: две колонки (текст + фото) --- */
+  .about-wrapper{
+    display:flex;
+    gap:36px;
+    align-items:center;
+    width:100%;
+    justify-content:center;
+    flex-wrap:wrap;
+  }
+  .about-text{
+    flex:1 1 60%;
+    background:#222;
+    color:#fff;
+    padding:36px;
+    border-radius:14px;
+    box-shadow:0 10px 40px rgba(0,0,0,.6);
+    font-size:1.05rem;
+    line-height:1.7;
+  }
+  .about-photo{
+    flex:1 1 35%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .about-photo img{
+    width:100%;
+    max-width:420px;
+    border-radius:14px;
+    box-shadow:0 10px 40px rgba(0,0,0,.6);
+    transform:translateX(10px);
+    opacity:0;
+    transition:transform .9s cubic-bezier(.2,.9,.3,1),opacity .9s ease;
+  }
+  .about-photo img.visible{transform:translateX(0);opacity:1}
+
+  @media (max-width:900px){
+    .about-wrapper{flex-direction:column-reverse;align-items:center}
+    .about-photo img{max-width:320px;transform:none}
+    .about-text{padding:22px}
+  }
+
+/* --- Достижения (новая сетка) --- */
+.achievements {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 36px;
+  width: 100%;
+  align-items: stretch;
+}
+
+.ach-item {
+  width: 44%;
+  background: #222;
+  border-radius: 12px;
+  margin-left: 27%;
+  padding: 18px;
+  box-shadow: 0 8px 30px rgba(0,0,0,.6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Квадрат для кубка */
+.ach-item img {
+  width: 100%;
+  aspect-ratio: 1 / 1; /* квадрат */
+  object-fit: contain;
+  margin-bottom: 12px;
+}
+
+.ach-highlight {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%; /* Соотношение сторон 16:9 */
+  height: 0;
+}
+
+.ach-highlight video {
+  position: absolute;
+  top: 0; 
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border: 4px solid #222222; /* Белая обводка */
+  border-radius: 12px;    /* Скругление углов */
+  box-shadow: 0 6px 20px rgba(0,0,0,0.6); /* Тень для объёма */
+}
+
+.ach-highlight .placeholder {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #111;
+  color: #bdbdbd;
+  font-size: 1rem;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+  /* --- Реклама (блок 2) --- */
+.ads-row {
+  margin-top: 90px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 60px; /* расстояние между баннерами */
+}
+
+.ad-card {
+  background: #222;
+  border-radius: 12px;
+  overflow: hidden;
+  width: 320px;   /* фиксированная ширина */
+  aspect-ratio: 9 / 16; /* форма баннера */
+  box-shadow: 0 8px 30px rgba(0,0,0,.6);
+}
+
+.ad-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+
+  /* --- Пазл (блок 3) --- */
+  .puzzle-wrap{
+    display:flex;
+    gap:28px;
+    align-items:flex-start;
+    justify-content:center;
+    width:100%;
+    flex-wrap:wrap;
+  }
+  .puzzle-board{
+    width:640px;
+    max-width:100%;
+    background:#1b1b1b;padding:14px;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.6);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .puzzle-grid{
+    position:relative;width:100%;aspect-ratio:4/3;background:#111;border-radius:8px;overflow:visible; touch-action:none;
+  }
+  .piece{
+    position:absolute;cursor:grab;border-radius:4px;transition:transform .22s cubic-bezier(.2,.9,.3,1),box-shadow .12s;box-shadow:0 6px 18px rgba(0,0,0,.45);
+    touch-action:none; user-select:none;
+  }
+  .piece.dragging{cursor:grabbing;transform:scale(1.02);box-shadow:0 14px 30px rgba(0,0,0,.6)}
+  .drop-cell{position:absolute;border:1px dashed rgba(255,255,255,.04);pointer-events:none}
+
+  .puzzle-controls{min-width:240px;max-width:320px}
+  .puzzle-info{background:#222;padding:16px;border-radius:12px;color:#ddd;box-shadow:0 8px 30px rgba(0,0,0,.6)}
+  .music-btn{display:inline-block;margin-top:12px;padding:10px 14px;border-radius:8px;background:linear-gradient(90deg,#ff9a9e,#fad0c4);color:#111;border:0;cursor:pointer}
+
+  .snap{animation:snap .28s cubic-bezier(.2,.9,.3,1)}
+  @keyframes snap{0%{transform:scale(.98)}50%{transform:scale(1.06)}100%{transform:scale(1)}}
+
+  /* --- Факты (блок 4) --- */
+  .facts-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;width:100%}
+  .fact-card{background:#222;padding:18px;border-radius:12px;color:#fff;box-shadow:0 8px 30px rgba(0,0,0,.6);min-height:120px}
+
+  /* --- Мелкие правки --- */
+  .muted{color:#bdbdbd}
+  .center{text-align:center}
+  .spaced{margin-top:12px}
+
+  /* ensure keyboard focus outlines visible */
+  :focus{outline:2px solid rgba(255,154,158,.25);outline-offset:2px}
+  
+  /* --- Галерея с бесконечной прокруткой --- */
+/* Стили для бесшовного маркера */
+.gallery-container {
+  width: 100%;
+  overflow: hidden;
+  background: #0f0f10;
+  padding: 24px 0;
+  box-sizing: border-box;
+}
+.gallery-track {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  /* animation properties will be set dynamically by JS using --duration variable */
+  animation: galleryScroll var(--duration, 70s) linear infinite;
+  will-change: transform;
+}
+.gallery-group { display:flex; gap:14px; align-items:center; }
+.gallery-group img {
+  height: 360px;      /* можно менять */
+  width: auto;
+  display: block;
+  border-radius: 8px;
+  object-fit: cover;
+  user-select: none;
+  -webkit-user-drag: none;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.45);
+  transition: transform .22s ease;
+}
+/* hover scale on image only (doesn't pause) */
+.gallery-group img:hover { transform: scale(1.03); }
+
+/* IMPORTANT: animation pauses ONLY when hovering image — handled in JS */
+/* fallback: if user hovers whole track, do not pause by default */
+/* keyframes translate to a distance that JS will set in CSS variable --scroll-distance */
+@keyframes galleryScroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(calc(-1 * var(--scroll-distance, 0px))); }
+}
+
+/* ====== Кнопки ====== */
+.fixed-buttons {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 15px;
+  z-index: 999;
+}
+
+.rgb-btn {
+  padding: 10px 18px;
+  background: #222;
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: bold;
+  transition: background 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.rgb-btn:hover {
+  animation: rgbBorder 1.5s linear infinite;
+}
+
+@keyframes rgbBorder {
+  0% { border-color: rgb(255, 0, 0); }
+  25% { border-color: rgb(0, 255, 0); }
+  50% { border-color: rgb(0, 0, 255); }
+  75% { border-color: rgb(255, 255, 0); }
+  100% { border-color: rgb(255, 0, 0); }
+}
+</style>
+</head>
+<body class="slider-active">
+
+<!-- ========== SLIDER (первый экран) ========== -->
+<div class="slider-wrapper" id="sliderWrapper">
+  <div class="page active" style="background-image:url('image/slide1.png')">
+    <div class="page-content">
+      <h1>Добро пожаловать!</h1>
+	  <p>Разрешаю вам в полной мере насладиться прекрасными и живописными местами Рязанской области</p>
+      <p>Прокрутите вниз — дальше полноэкранные секции</p>
+    </div>
+  </div>
+  <div class="page" style="background-image:url('image/slide2.png')">
+    <div class="page-content">
+      <h1>Горные вершины</h1>
+      <p>Место, где небо встречается с землей</p>
+    </div>
+  </div>
+  <div class="page" style="background-image:url('image/slide3.png')">
+    <div class="page-content">
+      <h1>Океанские просторы</h1>
+      <p>Бескрайние воды и глубокие тайны</p>
+    </div>
+  </div>
+  <div class="page" style="background-image:url('image/slide4.png')">
+    <div class="page-content">
+      <h1>Звёздное небо</h1>
+      <p>Бесконечность вселенной</p>
+    </div>
+  </div>
+</div>
+
+<!-- навигационные точки -->
+<div class="nav-dots" aria-hidden="true"></div>
+
+<!-- ========== ABOUT (второй экран) ========== -->
+<section class="content-section" id="aboutSection" aria-labelledby="aboutTitle">
+  <div class="section-inner container">
+    <div style="width:100%">
+      <div class="section-title" id="aboutTitle"><h2>Продолжение путешествия</h2></div>
+
+      <div class="about-wrapper">
+        <div class="about-text">
+          <p>Добрый день! Я Орлов Евгений Матвеевич, я владелец Рязанской пивоварни.</p>
+          <p>Я родился где-то в рядах Владая, для тех не шаряших — это там, где волки срать бояться.</p>
+          <p>День рождение моё начинается с 9 декабря 2005 года.</p>
+          <p>Я так-то обычный парень, который не боится грозы и сам вытираю попу.</p>
+          <p>А ещё я готов похвастаться — я сам вчера самостоятельно вышел в магазин за бутылочкой своего любимого пива!</p>
+          <p>В свои лихие 90-тые я служил в рядах доблестных сотрудников ДПС на ларгусе.</p>
+          <p>И тормозили всякие феррари, отстреливаясь арбузами моего любимого дяди КарЭна.</p>
+          <p>Я обладаю прекрасным талантом всасывания пивных молекул "Старый Мельник".</p>
+          <p>Баран мой на месте!</p>
+          <p>Смотрите на меня – вот что бывает, когда любишь пиво всем сердцем и постоянно стремишься к новым вершинам!</p>
+          <p>Я как этаноловый любитель пенного: и в знании сортов профи, и в умении создать правильную атмосферу за кружкой – кумир квартала, можно сказать.</p>
+        </div>
+
+        <div class="about-photo" aria-hidden="true">
+          <img id="aboutPhoto" src="image/me.png" alt="Фото">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== ACHIEVEMENTS (третий экран) ========== -->
+<section class="content-section" id="achSection" aria-labelledby="achTitle">
+  <div class="section-inner container">
+    <div style="width:100%">
+      <div class="section-title" id="achTitle"><h2>Достижения и хайлайты</h2></div>
+
+      <div class="achievements">
+        
+        <!-- Ряд 1: Кубок - Видео -->
+        <div class="ach-item">
+          <img src="image/achievement1.png" alt="">
+          <div class="muted spaced">Чемпион BLAST.tv Paris Major 2023</div>
+        </div>
+        <div class="ach-highlight">
+          <div class="placeholder"><video autoplay muted loop playsinline><source src="video/video1.mp4" type="video/mp4">Ваш браузер не поддерживает видео.</video></div>
+        </div>
+
+        <!-- Ряд 2: Видео - Кубок -->
+        <div class="ach-highlight">
+          <div class="placeholder"><video autoplay muted loop playsinline><source src="video/video2.mp4" type="video/mp4">Ваш браузер не поддерживает видео.</video></div>
+        </div>
+        <div class="ach-item">
+          <img src="image/achievement2.png" alt="">
+          <div class="muted spaced">Чемпион Perfect World Shanghai Major 2024</div>
+        </div>
+
+        <!-- Ряд 3: Кубок - Видео -->
+        <div class="ach-item">
+          <img src="image/achievement3.png" alt="">
+          <div class="muted spaced">Полуфиналист PGL Major Antwerp 2022</div>
+        </div>
+        <div class="ach-highlight">
+          <div class="placeholder"><video autoplay muted loop playsinline height='100%'>><source src="video/video3.mp4" type="video/mp4">Ваш браузер не поддерживает видео.</video></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== ADS (четвёртый экран) ========== -->
+<section class="content-section" id="adsSection" aria-labelledby="adsTitle">
+  <div class="section-inner container">
+    <div style="width:100%">
+      <div class="section-title" id="adsTitle"><h2>Реклама / баннеры</h2></div>
+		<div class="ads-row">
+		  <a href="https://skinhouse.gg/" target="_blank" class="ad-card">
+			<img src="rec/promo1.png" alt="banner1">
+		  </a>
+		  <a href="https://playjabka.com/x1Q0M5ty4s" target="_blank" class="ad-card">
+			<img src="rec/promo2.png" alt="banner2">
+		  </a>
+		  <a href="https://easy-drop.vip/" target="_blank" class="ad-card">
+			<img src="rec/promo3.png" alt="banner3">
+		  </a>
+		  <a href="https://skinout.gg/ru" target="_blank" class="ad-card">
+			<img src="rec/promo4.png" alt="banner4">
+		  </a>
+		</div>
+    </div>
+  </div>
+</section>
+
+
+
+<!-- ========== PUZZLE (пятый экран) ========== -->
+<section class="content-section puzzle-section" id="puzzleSection" aria-labelledby="puzzleTitle">
+  <div class="section-inner container">
+    <div style="width:100%">
+      <div class="section-title" id="puzzleTitle"><h2>Пазл — собери фото Женька</h2></div>
+
+      <div class="puzzle-wrap">
+        <div class="puzzle-board" id="puzzleBoard">
+          <div id="puzzleGrid" class="puzzle-grid" aria-hidden="false"></div>
+        </div>
+
+        <div class="puzzle-controls">
+          <div class="puzzle-info">
+            <div>Перетащи кусочки на поле, чтобы собрать изображение.</div>
+            <div id="puzzleStatus" class="spaced muted">Собрано: <span id="puzzleCount">0</span>/<span id="puzzleTotal">0</span></div>
+            <button id="musicToggle" class="music-btn" aria-pressed="false">Включить музыку</button>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- скрытый аудиоплеер -->
+  <audio id="puzzleAudio" preload="auto" src="audio/ya_po_chasticam.mp3"></audio>
+</section>
+
+<!-- ========== FACTS (шестой экран) ========== -->
+<section class="content-section" id="factsSection" aria-labelledby="factsTitle">
+  <div class="section-inner container">
+    <div style="width:100%">
+      <div class="section-title" id="factsTitle"><h2>Интересные факты</h2></div>
+
+      <div class="facts-grid">
+        <div class="fact-card"><strong>Факт 1</strong><p>Любит пиво и знает сорта.</p></div>
+        <div class="fact-card"><strong>Факт 2</strong><p>Служил в ДПС на ларгусе.</p></div>
+        <div class="fact-card"><strong>Факт 3</strong><p>Самостоятельный и решительный.</p></div>
+        <div class="fact-card"><strong>Факт 4</strong><p>Кумир квартала за своими навыками.</p></div>
+		<div class="fact-card"><strong>Факт 5</strong><p>Когда-то смотрел аниме.</p></div>
+		<div class="fact-card"><strong>Факт 6</strong><p>Зачем то закрывает входные двери на замок.</p></div>
+		<div class="fact-card"><strong>Факт 7</strong><p>После школы ел батон с кока колой.</p></div>
+		<div class="fact-card"><strong>Факт 8</strong><p>Единственный выживший после настойки с квасом.</p></div>
+		<div class="fact-card"><strong>Факт 9</strong><p>В детстве занимался паркуром.</p></div>
+		<div class="fact-card"><strong>Факт 10</strong><p>Больше не живёт в Рязани.</p></div>
+		<div class="fact-card"><strong>Факт 11</strong><p>Проиграл в казино Рязань.</p></div>
+		<div class="fact-card"><strong>Факт 12</strong><p>Не осилил 70 литров пива за вечер.</p></div>
+		<div class="fact-card"><strong>Факт 13</strong><p>Имеет брата.</p></div>
+		<div class="fact-card"><strong>Факт 14</strong><p>Пузо может работать как бронижелет.</p></div>
+		<div class="fact-card"><strong>Факт 15</strong><p>Конь всегда под навесом.</p></div>
+		<div class="fact-card"><strong>Факт 16</strong><p>Съедал людей от чего такой кровожадно спокойный.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== Блок: бесшовный зацикленный скролл 80 фото (останавливается ТОЛЬКО при наведении на фото) ====== -->
+<section class="content-section" id="gallerySection" aria-labelledby="galleryTitle">
+  <div class="section-inner container" style="flex-direction:column;">
+    <div class="section-title" id="galleryTitle"><h2>Галерея</h2></div>
+
+    <div class="gallery-container" aria-hidden="false">
+      <div class="gallery-track">
+        <div class="gallery-group">
+          <!-- Первая группа: 80 фото (замени пути, если надо) -->
+          <img src="img/photo (1).jpg" alt="">
+          <img src="img/photo (2).jpg" alt="">
+          <img src="img/photo (3).jpg" alt="">
+          <img src="img/photo (4).jpg" alt="">
+          <img src="img/photo (5).jpg" alt="">
+          <img src="img/photo (6).jpg" alt="">
+          <img src="img/photo (7).jpg" alt="">
+          <img src="img/photo (8).jpg" alt="">
+          <img src="img/photo (9).jpg" alt="">
+          <img src="img/photo (10).jpg" alt="">
+          <img src="img/photo (11).jpg" alt="">
+          <img src="img/photo (12).jpg" alt="">
+          <img src="img/photo (13).jpg" alt="">
+          <img src="img/photo (14).jpg" alt="">
+          <img src="img/photo (15).jpg" alt="">
+          <img src="img/photo (16).jpg" alt="">
+          <img src="img/photo (17).jpg" alt="">
+          <img src="img/photo (18).jpg" alt="">
+          <img src="img/photo (19).jpg" alt="">
+          <img src="img/photo (20).jpg" alt="">
+          <img src="img/photo (21).jpg" alt="">
+          <img src="img/photo (22).jpg" alt="">
+          <img src="img/photo (23).jpg" alt="">
+          <img src="img/photo (24).jpg" alt="">
+          <img src="img/photo (25).jpg" alt="">
+          <img src="img/photo (26).jpg" alt="">
+          <img src="img/photo (27).jpg" alt="">
+          <img src="img/photo (28).jpg" alt="">
+          <img src="img/photo (29).jpg" alt="">
+          <img src="img/photo (30).jpg" alt="">
+          <img src="img/photo (31).jpg" alt="">
+          <img src="img/photo (32).jpg" alt="">
+          <img src="img/photo (33).jpg" alt="">
+          <img src="img/photo (34).jpg" alt="">
+          <img src="img/photo (35).jpg" alt="">
+          <img src="img/photo (36).jpg" alt="">
+          <img src="img/photo (37).jpg" alt="">
+          <img src="img/photo (38).jpg" alt="">
+          <img src="img/photo (39).jpg" alt="">
+          <img src="img/photo (40).jpg" alt="">
+          <img src="img/photo (41).jpg" alt="">
+          <img src="img/photo (42).jpg" alt="">
+          <img src="img/photo (43).jpg" alt="">
+          <img src="img/photo (44).jpg" alt="">
+          <img src="img/photo (45).jpg" alt="">
+          <img src="img/photo (46).jpg" alt="">
+          <img src="img/photo (47).jpg" alt="">
+          <img src="img/photo (48).jpg" alt="">
+          <img src="img/photo (49).jpg" alt="">
+          <img src="img/photo (50).jpg" alt="">
+          <img src="img/photo (51).jpg" alt="">
+          <img src="img/photo (52).jpg" alt="">
+          <img src="img/photo (53).jpg" alt="">
+          <img src="img/photo (54).jpg" alt="">
+          <img src="img/photo (55).jpg" alt="">
+          <img src="img/photo (56).jpg" alt="">
+          <img src="img/photo (57).jpg" alt="">
+          <img src="img/photo (58).jpg" alt="">
+          <img src="img/photo (59).jpg" alt="">
+          <img src="img/photo (60).jpg" alt="">
+          <img src="img/photo (61).jpg" alt="">
+          <img src="img/photo (62).jpg" alt="">
+          <img src="img/photo (63).jpg" alt="">
+          <img src="img/photo (64).jpg" alt="">
+          <img src="img/photo (65).jpg" alt="">
+          <img src="img/photo (66).jpg" alt="">
+          <img src="img/photo (67).jpg" alt="">
+          <img src="img/photo (68).jpg" alt="">
+          <img src="img/photo (69).jpg" alt="">
+          <img src="img/photo (70).jpg" alt="">
+          <img src="img/photo (71).jpg" alt="">
+          <img src="img/photo (72).jpg" alt="">
+          <img src="img/photo (73).jpg" alt="">
+          <img src="img/photo (74).jpg" alt="">
+          <img src="img/photo (75).jpg" alt="">
+          <img src="img/photo (76).jpg" alt="">
+          <img src="img/photo (77).jpg" alt="">
+          <img src="img/photo (78).jpg" alt="">
+          <img src="img/photo (79).jpg" alt="">
+          <img src="img/photo (80).jpg" alt="">
+		  <img src="img/photo (81).jpg" alt="">
+          <img src="img/photo (82).jpg" alt="">
+          <img src="img/photo (83).jpg" alt="">
+          <img src="img/photo (84).jpg" alt="">
+          <img src="img/photo (85).jpg" alt="">
+          <img src="img/photo (86).jpg" alt="">
+          <img src="img/photo (87).jpg" alt="">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- ====== Фиксированные кнопки ====== -->
+<div class="fixed-buttons" id="fixedButtons">
+  <a href="https://vk.com/twenterek" class="rgb-btn">Vk</a>
+  <a href="https://steamcommunity.com/id/twenter_ek" class="rgb-btn">Steam</a>
+  <a href="https://www.faceit.com/en/players/PRIDATOREK" class="rgb-btn">Faceit</a>
+  <a href="https://www.twitch.tv/evgenkoter" class="rgb-btn">Twitch</a>
+  <a href="https://www.youtube.com/@e.twenter7363" class="rgb-btn">Youtube</a>
+</div>
+<script>
+/* =========================================
+   SLIDER (как раньше) — перелистывание,
+   затем скрытие слайдера чтобы видеть секции
+   ========================================= */
+(function(){
+  const pages = document.querySelectorAll('.page');
+  const navDots = document.querySelector('.nav-dots');
+  const sliderWrapper = document.getElementById('sliderWrapper');
+  let currentPage = 0;
+  let isAnimating = false;
+  let mode = 'slider';
+
+  // Создаём точки
+  pages.forEach((_, i) => {
+    const dot = document.createElement('div');
+    dot.className = 'dot' + (i===0 ? ' active' : '');
+    dot.setAttribute('aria-label', 'Перейти к слайду ' + (i+1));
+    dot.addEventListener('click', ()=>goToPage(i));
+    navDots.appendChild(dot);
+  });
+
+  function updateDots(){
+    document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('active', i===currentPage));
+  }
+
+  function goToPage(index){
+    if(isAnimating || index===currentPage) return;
+    isAnimating = true;
+    pages[currentPage].classList.remove('active');
+    pages[currentPage].classList.add('prev');
+    pages[index].classList.add('active');
+    currentPage = index;
+    updateDots();
+    setTimeout(()=>{ pages.forEach(p=>p.classList.remove('prev')); isAnimating=false }, 1000);
+  }
+
+  // wheel / keyboard handling
+  window.addEventListener('wheel', e=>{
+    if(mode === 'slider'){
+      if(isAnimating) return;
+      if(e.deltaY > 0){
+        if(currentPage < pages.length - 1) goToPage(currentPage+1);
+        else switchToContent();
+      } else if(e.deltaY < 0 && currentPage > 0){
+        goToPage(currentPage-1);
+      }
+    } else {
+      // если уже контент — оставляем стандартный scroll-snap поведение
+      if(window.scrollY === 0 && e.deltaY < 0) {
+        // если пользователь на вершине страницы и клик вверх — вернём слайдер
+        switchToSlider();
+      }
+    }
+  }, {passive:true});
+
+  function switchToContent(){
+    mode = 'content';
+    navDots.style.display = 'none';
+    sliderWrapper.classList.add('to-content');
+    pages[currentPage].style.opacity = '0';
+    setTimeout(()=>{
+      sliderWrapper.classList.add('hidden');
+      document.body.classList.remove('slider-active');
+      // чтобы после скрытия слайдера скролл-snap центровал следующую секцию (about)
+      // прокрутим немного вниз на 1px чтобы активировать snap (не всегда нужно)
+      window.scrollTo({ top: 1, behavior: 'smooth' });
+    }, 1000);
+  }
+
+  function switchToSlider(){
+    mode = 'slider';
+    sliderWrapper.classList.remove('hidden');
+    document.body.classList.add('slider-active');
+    navDots.style.display = 'flex';
+    sliderWrapper.classList.add('from-content');
+    // скроем визуально другие секции (не требуется если скрыли slider)
+    setTimeout(()=>{ pages[currentPage].style.opacity='1' }, 50);
+    // прокрутка к началу (слайдер)
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // keyboard arrows
+  window.addEventListener('keydown', e=>{
+    if(mode === 'slider' && !isAnimating){
+      if(e.key === 'ArrowDown') {
+        if(currentPage < pages.length - 1) goToPage(currentPage+1);
+        else switchToContent();
+      } else if(e.key === 'ArrowUp') {
+        if(currentPage > 0) goToPage(currentPage-1);
+      }
+    }
+  });
+})(); // slider IIFE
+
+/* =========================================
+   ABOUT PHOTO animation on visible
+   ========================================= */
+(function(){
+  const aboutPhoto = document.getElementById('aboutPhoto');
+  // reveal photo when about section mostly visible
+  const obs = new IntersectionObserver(entries=>{
+    entries.forEach(en=>{
+      if(en.isIntersecting){
+        aboutPhoto.classList.add('visible');
+      } else {
+        aboutPhoto.classList.remove('visible');
+      }
+    });
+  }, {threshold:0.45});
+  const aboutSection = document.getElementById('aboutSection');
+  if(aboutSection) obs.observe(aboutSection);
+})();
+
+/* =========================================
+   PUZZLE: generation, drag/pointer, snap,
+   and music autostart via IntersectionObserver
+   ========================================= */
+(function(){
+  const puzzleGrid = document.getElementById('puzzleGrid');
+  const puzzleBoard = document.getElementById('puzzleBoard');
+  const statusCount = document.getElementById('puzzleCount');
+  const statusTotal = document.getElementById('puzzleTotal');
+  const audio = document.getElementById('puzzleAudio');
+  const musicToggle = document.getElementById('musicToggle');
+  const puzzleSection = document.getElementById('puzzleSection');
+
+  // puzzle config — можно менять
+  const cols = 5;
+  const rows = 6;
+  const total = cols * rows;
+  statusTotal.textContent = total;
+
+  // utility shuffle
+  function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]] } }
+
+  function buildPuzzle(){
+    // clear
+    puzzleGrid.innerHTML = '';
+    // board sizing
+    const boardRect = puzzleBoard.getBoundingClientRect();
+    const width = Math.min(boardRect.width, 820); // cap a bit for very wide screens
+    const height = Math.round(width * 3/4);
+    puzzleGrid.style.width = width + 'px';
+    puzzleGrid.style.height = height + 'px';
+    puzzleGrid.style.position = 'relative';
+
+    const pw = Math.floor(width / cols);
+    const ph = Math.floor(height / rows);
+
+    // create drop cells
+    const dropCells = [];
+    for(let r=0;r<rows;r++){
+      for(let c=0;c<cols;c++){
+        const cell = document.createElement('div');
+        cell.className = 'drop-cell';
+        cell.style.left = (c*pw) + 'px';
+        cell.style.top = (r*ph) + 'px';
+        cell.style.width = pw + 'px';
+        cell.style.height = ph + 'px';
+        cell.dataset.index = r*cols + c;
+        puzzleGrid.appendChild(cell);
+        dropCells.push(cell);
+      }
+    }
+
+    // image source
+    const src = 'image/puzzle.jpg'; // заменяй на своё
+    // prepare indices and shuffle initial placement positions
+    const indices = Array.from({length: total}, (_,i)=>i);
+    shuffle(indices);
+
+    // create pieces
+    const pieces = [];
+    for(let i=0;i<total;i++){
+      const r = Math.floor(i/cols), c = i%cols;
+      const piece = document.createElement('div');
+      piece.className = 'piece';
+      piece.style.width = pw + 'px';
+      piece.style.height = ph + 'px';
+      const bgX = -(c * pw);
+      const bgY = -(r * ph);
+      piece.style.backgroundImage = `url("${src}")`;
+      piece.style.backgroundSize = `${cols * pw}px ${rows * ph}px`;
+      piece.style.backgroundPosition = `${bgX}px ${bgY}px`;
+      piece.dataset.correctIndex = i;
+      // randomize starting position (right side)
+      const x = width - 930 + (Math.random()*120);
+      const y = Math.random()*(height - ph);
+      piece.style.left = x + 'px';
+      piece.style.top = y + 'px';
+      piece.dataset.placed = '0';
+      puzzleGrid.appendChild(piece);
+      pieces.push(piece);
+    }
+
+    // drag logic using pointer events
+    let dragging = null, offsetX = 0, offsetY = 0;
+    function downHandler(e){
+      const target = e.target;
+      if(!target.classList.contains('piece')) return;
+      e.preventDefault();
+      dragging = target;
+      dragging.classList.add('dragging');
+      const rect = dragging.getBoundingClientRect();
+      offsetX = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
+      offsetY = (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top;
+      dragging.style.zIndex = 9999;
+      // prevent text selection
+      document.body.style.userSelect = 'none';
+    }
+    function moveHandler(e){
+      if(!dragging) return;
+      e.preventDefault();
+      const clientX = (e.clientX !== undefined) ? e.clientX : (e.touches && e.touches[0].clientX);
+      const clientY = (e.clientY !== undefined) ? e.clientY : (e.touches && e.touches[0].clientY);
+      const parentRect = puzzleGrid.getBoundingClientRect();
+      let left = clientX - parentRect.left - offsetX;
+      let top  = clientY - parentRect.top - offsetY;
+      left = Math.max(-pw, Math.min(left, parentRect.width + 40));
+      top  = Math.max(-ph, Math.min(top, parentRect.height + 40));
+      dragging.style.left = left + 'px';
+      dragging.style.top = top + 'px';
+    }
+    function upHandler(e){
+      if(!dragging) return;
+      // center of piece relative to grid
+      const left = parseFloat(dragging.style.left);
+      const top  = parseFloat(dragging.style.top);
+      const centerX = left + pw/2;
+      const centerY = top + ph/2;
+      let placed = false;
+      for(const cell of dropCells){
+        const cx = parseFloat(cell.style.left), cy = parseFloat(cell.style.top);
+        const cw = parseFloat(cell.style.width), ch = parseFloat(cell.style.height);
+        if(centerX >= cx && centerX <= cx+cw && centerY >= cy && centerY <= cy+ch){
+          const correct = parseInt(dragging.dataset.correctIndex,10);
+          const targetIndex = parseInt(cell.dataset.index,10);
+          if(correct === targetIndex){
+            dragging.style.left = cx + 'px';
+            dragging.style.top = cy + 'px';
+            dragging.style.zIndex = 1;
+            dragging.classList.add('snap');
+            setTimeout(()=>dragging.classList.remove('snap'),300);
+            dragging.dataset.placed = '1';
+            placed = true;
+            updateCount();
+            // optional click sound:
+            // new Audio('audio/click.mp3').play();
+          } else {
+            // wrong spot -> small feedback
+            dragging.classList.add('snap');
+            setTimeout(()=>dragging.classList.remove('snap'),220);
+          }
+          break;
+        }
+      }
+      if(!placed){
+        // leave where released
+        dragging.style.zIndex = 2;
+      }
+      dragging.classList.remove('dragging');
+      dragging = null;
+      document.body.style.userSelect = '';
+    }
+
+    // attach pointer events to grid (covers pieces)
+    puzzleGrid.addEventListener('pointerdown', downHandler);
+    window.addEventListener('pointermove', moveHandler);
+    window.addEventListener('pointerup', upHandler);
+
+    // helper updateCount
+function updateCount(){
+  const placedCount = puzzleGrid.querySelectorAll('.piece[data-placed="1"]').length;
+  statusCount.textContent = placedCount;
+  if(placedCount === total){
+    setTimeout(()=>{
+      // Останавливаем основную музыку
+      try { audio.pause(); audio.currentTime = 0; } catch(e){}
+
+      showWinOverlay();
+
+      // Добавляем кнопку "Посмотреть снова" (если ещё нет)
+      const replayBtnId = "replayWinBtn";
+      if(!document.getElementById(replayBtnId)){
+        const replayBtn = document.createElement('button');
+        replayBtn.id = replayBtnId;
+        replayBtn.textContent = '18+';
+        replayBtn.style.marginTop = '10px';
+        replayBtn.style.padding = '8px 14px';
+        replayBtn.style.borderRadius = '8px';
+        replayBtn.style.border = 'none';
+        replayBtn.style.background = 'linear-gradient(90deg,#ff9a9e,#fad0c4)';
+        replayBtn.style.cursor = 'pointer';
+        replayBtn.style.fontWeight = 'bold';
+        replayBtn.addEventListener('click', showWinOverlay);
+        document.querySelector('.puzzle-info').appendChild(replayBtn);
+      }
+    }, 200);
+  }
+}
+
+function showWinOverlay(){
+  // Создаём оверлей
+  const overlay = document.createElement('div');
+  overlay.style.position = 'fixed';
+  overlay.style.top = 0;
+  overlay.style.left = 0;
+  overlay.style.width = '100%';
+  overlay.style.height = '100%';
+  overlay.style.background = 'rgba(0,0,0,0.8)';
+  overlay.style.display = 'flex';
+  overlay.style.alignItems = 'center';
+  overlay.style.justifyContent = 'center';
+  overlay.style.zIndex = 99999;
+
+  const img = document.createElement('img');
+  img.src = 'image/congrats.png';
+  img.style.maxWidth = '80%';
+  img.style.maxHeight = '80%';
+  img.style.borderRadius = '12px';
+  img.style.boxShadow = '0 0 30px rgba(255,255,255,0.6)';
+
+  overlay.appendChild(img);
+  document.body.appendChild(overlay);
+
+  // Музыка победы
+  const winAudio = new Audio('audio/win.mp3');
+  winAudio.play();
+
+  // Закрытие по клику
+  overlay.addEventListener('click', () => {
+    winAudio.pause();
+    overlay.remove();
+  });
+}
+
+    // expose for debug if needed
+    window.__puzzle = { pieces, dropCells, updateCount };
+    updateCount();
+  } // end buildPuzzle
+
+  // build on load
+  window.addEventListener('load', buildPuzzle);
+  // rebuild on resize to keep proportion
+  let resizeTimeout;
+  window.addEventListener('resize', ()=>{ clearTimeout(resizeTimeout); resizeTimeout = setTimeout(()=>{ const grid = document.getElementById('puzzleGrid'); if(grid) grid.innerHTML=''; buildPuzzle(); }, 300) });
+
+  /* ====== MUSIC: play when puzzle section enters viewport ====== */
+  let musicStarted = false;
+  const obs = new IntersectionObserver(entries=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting && !musicStarted){
+        audio.play().then(()=>{
+          musicStarted = true;
+          musicToggle.textContent = 'Музыка играет';
+          musicToggle.setAttribute('aria-pressed','true');
+        }).catch(()=>{ /* autoplay blocked; user can press button */ });
+      }
+    });
+  }, {threshold:0.45});
+  if(puzzleSection) obs.observe(puzzleSection);
+
+  // manual toggle
+  musicToggle.addEventListener('click', ()=>{
+    if(audio.paused){
+      audio.play().then(()=>{ musicToggle.textContent='Музыка играет'; musicToggle.setAttribute('aria-pressed','true') })
+      .catch(()=>alert('Браузер блокирует автоматическое воспроизведение; разрешите звук для страницы.'));
+    } else {
+      audio.pause(); audio.currentTime = 0; musicToggle.textContent='Включить музыку'; musicToggle.setAttribute('aria-pressed','false');
+    }
+  });
+})(); // end puzzle module
+
+/* OPTIONAL: smooth keyboard navigation between sections (PageUp/PageDown) */
+(function(){
+  const sections = Array.from(document.querySelectorAll('section.content-section'));
+  window.addEventListener('keydown', e=>{
+    if(e.key === 'PageDown' || e.key === 'ArrowDown'){
+      // find currently visible section
+      const top = window.scrollY;
+      for(let s of sections){
+        const r = s.getBoundingClientRect();
+        if(r.top > 10){ s.scrollIntoView({behavior:'smooth'}); break; }
+      }
+    } else if(e.key === 'PageUp' || e.key === 'ArrowUp'){
+      const top = window.scrollY;
+      for(let i=sections.length-1;i>=0;i--){
+        const r = sections[i].getBoundingClientRect();
+        if(r.top < -10 || (r.top < window.innerHeight/2 && r.top < 0)){ sections[i].scrollIntoView({behavior:'smooth'}); break; }
+      }
+    }
+  });
+})();
+
+
+document.addEventListener('DOMContentLoaded', () => {
+  const track = document.querySelector('.gallery-track');
+  const group = document.querySelector('.gallery-group');
+  if (!track || !group) return;
+
+  // Дублируем первую группу (чтобы была вторая копия для бесшовности)
+  const clone = group.cloneNode(true);
+  track.appendChild(clone);
+
+  // Функция ожидания загрузки всех изображений в первой группе
+  const imgs = Array.from(group.querySelectorAll('img'));
+  const loadPromises = imgs.map(img => new Promise(resolve => {
+    if (img.complete && img.naturalWidth !== 0) return resolve();
+    img.addEventListener('load', resolve);
+    img.addEventListener('error', resolve); // даже если ошибка — продолжаем
+  }));
+
+  Promise.all(loadPromises).then(() => {
+    // вычисляем ширину первой группы (включая gap)
+    const groupRect = group.getBoundingClientRect();
+    const distance = Math.round(groupRect.width + 14); // +gap to be safe
+    // устанавливаем CSS-переменную для анимации
+    document.documentElement.style.setProperty('--scroll-distance', distance + 'px');
+
+    // рассчитываем продолжительность анимации, чтобы скорость была примерно постоянной
+    // чем больше distance — тем длиннее duration. pixelsPerSecond регулирует скорость.
+    const pixelsPerSecond = 120; // можешь уменьшить/увеличить (меньше = медленнее)
+    let durationSec = Math.max(12, Math.round(distance / pixelsPerSecond));
+    // делаем немного более плавно при очень большой дистанции
+    if (durationSec < 30 && distance > 3000) durationSec = Math.round(distance / 100);
+    document.documentElement.style.setProperty('--duration', durationSec + 's');
+
+    // Повесим обработчики — пауза ТОЛЬКО при наведении непосредственно на картинку
+    const allImgs = Array.from(track.querySelectorAll('img'));
+    allImgs.forEach(img => {
+      img.addEventListener('mouseenter', () => {
+        track.style.animationPlayState = 'paused';
+      });
+      img.addEventListener('mouseleave', () => {
+        track.style.animationPlayState = 'running';
+      });
+      // для сенсорных устройств: touchstart / touchend
+      img.addEventListener('touchstart', () => {
+        track.style.animationPlayState = 'paused';
+      }, {passive:true});
+      img.addEventListener('touchend', () => {
+        track.style.animationPlayState = 'running';
+      }, {passive:true});
+    });
+  });
+
+  // на ресайзе пересчитываем (debounce)
+  let rt;
+  window.addEventListener('resize', () => {
+    clearTimeout(rt);
+    rt = setTimeout(() => {
+      // recompute width
+      const groupRect = group.getBoundingClientRect();
+      const distance = Math.round(groupRect.width + 14);
+      document.documentElement.style.setProperty('--scroll-distance', distance + 'px');
+      const pixelsPerSecond = 120;
+      let durationSec = Math.max(12, Math.round(distance / pixelsPerSecond));
+      document.documentElement.style.setProperty('--duration', durationSec + 's');
+    }, 250);
+  });
+});
+const fixedButtons = document.getElementById('fixedButtons');
+const sliderWrapper = document.getElementById('sliderWrapper');
+
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      fixedButtons.style.display = 'none';
+    } else {
+      fixedButtons.style.display = 'flex';
+    }
+  });
+}, { threshold: 0.6 });
+
+if (sliderWrapper) {
+  observer.observe(sliderWrapper);
+}
+</script>
+</body>
+</html>
